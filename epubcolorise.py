@@ -9,7 +9,11 @@ from ebooklib import epub
 
 import coloriser
 
+# XHTML files to always ignore
+XHTML_TO_IGNORE = {}
 
+
+# Colorise an epub!
 class EpubColorise:
     # inpath: string | path to an epub file
     # outpath: string | path to output to (including output name)
@@ -40,19 +44,21 @@ class EpubColorise:
     # write the colorised epub to the output path
     def write(self):
         # add style
-        print(f"Adding style to {self.title}")
-        css = epub.EpubItem(uid="global_colorised_style",
-                            file_name=self.options.globalstyle,
-                            media_type="text/css",
-                            content=self.options.get_style())
-        self.book.add_item(css)
+        # print(f"Adding style to {self.title}")
+        # css = epub.EpubItem(uid="global_colorised_style",
+        #                     file_name=self.options.globalstyle,
+        #                     media_type="text/css",
+        #                     content=self.options.get_style())
+        # self.book.add_item(css)
 
         # add color
-        print(f"Colorisng {self.title}")
+        print(f"Performing full colorisation for {self.title}")
         clr = coloriser.Coloriser(self.options)
         # iterate over xhtml
         for xhtml in self.book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
-            print(f"Colorising {xhtml.get_name()}")
-            xhtml.set_content(clr.colorise_xhtml(xhtml.get_content()))
+            if not XHTML_TO_IGNORE.get(xhtml.get_name()):
+                print(f"Colorising {xhtml.get_name()}")
+                xhtml.set_content(clr.colorise_xhtml(xhtml.get_content()))
 
+        # write final product
         epub.write_epub(self.outpath, self.book)

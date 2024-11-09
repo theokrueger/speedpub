@@ -2,6 +2,7 @@
 # convert some text into coloured HTML
 import sys
 from enum import Enum
+from bs4 import BeautifulSoup
 
 
 # Our distilled prats of speech
@@ -27,7 +28,7 @@ class ColoriseOptions:
     # lang: string | language identifier
     def __init__(self, lang):
         # set defaults
-        self.globalstyle = "colorised-style.css"
+        #self.globalstyle = "colorised-style.css"
         self.lang = lang
         self.bgcolor = "transparent"
         self.colors = {
@@ -48,7 +49,12 @@ class ColoriseOptions:
     # get the style information for the selected colors
     # return: string | css style information
     def get_style(self):
-        s = f"body {{ background-color: {self.bgcolor}; }}\n"
+        s = f"""
+        body {{
+          background-color: {self.bgcolor};
+          color: {self.colors.get(POS.Untagged)};
+        }}
+        """
         for k in self.colors:
             s += f"{k.value} {{ color: {self.colors.get(k)}; }}\n"
         return s
@@ -90,11 +96,16 @@ class Coloriser:
     def colorise_text(self, text):
         return 'hi'
 
-    # text: string | xhtml text
+    # xhtml: bytes | xhtml text
     # return: string | colorised text
-    def colorise_xhtml(self, text):
-        # todo add style
-        return self.colorise_text(text)
+    def colorise_xhtml(self, xhtml):
+        soup = BeautifulSoup(xhtml, 'html.parser')
+        # add style
+        style_tag = soup.new_tag('style')
+        style_tag.string = self.opts.get_style()
+        soup.html.body.insert(0, style_tag)
+
+        return str.encode(soup.prettify())
 
 
 # from pathlib import Path
