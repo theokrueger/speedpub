@@ -1,4 +1,6 @@
-out.html
+__pycache__/
+epubs/
+out/
 # emacs stuff
 \#*
 *~
