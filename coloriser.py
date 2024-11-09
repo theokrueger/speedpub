@@ -3,6 +3,9 @@
 import sys
 from enum import Enum
 from bs4 import BeautifulSoup
+import nltk
+from nltk.tokenize import word_tokenize, sent_tokenize
+import re
 
 
 # Our distilled prats of speech
@@ -19,6 +22,47 @@ class POS(Enum):
     Conjunction = 'cj'  # and/or/but
     Pronoun = 'pn'  # style as a noun probably
     Modal = 'ml'  # will/can/might/do
+
+    # Lookup table to convert the NLTK POS tags to our POS tags
+
+
+NLTK_TAG_LOOKUP = {
+    "CC": POS.Conjunction,
+    "CD": POS.Untagged,
+    "DT": POS.Article,
+    "EX": POS.Untagged,  # TODO
+    "FW": POS.Untagged,
+    "IN": POS.Preposition,
+    "JJ": POS.Adjective,
+    "JJR": POS.Adjective,
+    "JJS": POS.Adjective,
+    "LS": POS.Untagged,
+    "MD": POS.Modal,
+    "NN": POS.Noun,
+    "NNS": POS.Noun,
+    "NNP": POS.Noun,
+    "NNPS": POS.Noun,
+    "PDT": POS.Article,
+    "POS": POS.Adjective,
+    "PRP": POS.Pronoun,
+    "PRP$": POS.Pronoun,
+    "RB": POS.Adverb,
+    "RBR": POS.Adverb,
+    "RBS": POS.Adverb,
+    "RP": POS.Article,
+    "TO": POS.Article,  # TODO
+    "UH": POS.Interjection,
+    "VB": POS.Verb,
+    "VBD": POS.Verb,
+    "VBG": POS.Verb,
+    "VBN": POS.Verb,
+    "VBP": POS.Verb,
+    "VBZ": POS.Verb,
+    "WDT": POS.Article,
+    "WP": POS.Pronoun,
+    "WP$": POS.Pronoun,
+    "WRB": POS.Adverb,
+}
 
 
 # Options passed to the colorise function
@@ -100,108 +144,35 @@ class Coloriser:
     # return: string | colorised text
     def colorise_xhtml(self, xhtml):
         soup = BeautifulSoup(xhtml, 'html.parser')
-        # add style
+
+        # add color tags to text
+        for htmltag in soup.html.body.find_all(re.compile("p")):
+            if htmltag.string:
+                # NLTK tag the content
+                words = nltk.word_tokenize(htmltag.string)
+                tagged = nltk.pos_tag(words)  # [(word, tag), ...]
+                htmltag.string = ""
+                # add our coloring to the content
+                for (word, tag) in tagged:
+                    # apply color
+                    tag = NLTK_TAG_LOOKUP.get(tag)
+                    if tag == None:
+                        tag = POS.Untagged
+                    new_child = soup.new_tag(tag.value)
+                    # apply bold if applicable
+                    if self.opts.embolden:
+                        half = int(len(word) / 2)
+                        bold = soup.new_tag('b')
+                        bold.string = f"{word[:half]}"
+                        new_child.string = f"{word[half:]}"
+                        new_child.insert(0, bold)
+                    else:
+                        new_child.string = word
+                    htmltag.append(new_child)
+
+        # add style to top
         style_tag = soup.new_tag('style')
         style_tag.string = self.opts.get_style()
         soup.html.body.insert(0, style_tag)
 
         return str.encode(soup.prettify())
-
-
-# from pathlib import Path
-# from enum import Enum
-
-# import nltk
-# from nltk.corpus import stopwords
-# from nltk.tokenize import word_tokenize, sent_tokenize
-
-# stop_words = set(stopwords.words('english'))
-
-# COLOUR_LOOKUP = {
-#     'c0': '#eee8d5',
-#     'c1': '#b58900',
-#     'c2': '#cb4b16',
-#     'c3': '#dc322f',
-#     'c4': '#d33682',
-#     'c5': '#6c71c4',
-#     'c6': '#268bd2',
-#     'c7': '#2aa198',
-#     'c8': '#859900',
-# }
-
-# TAG_LOOKUP = {
-#     "CC": POS.Conjunction,
-#     "CD": POS.Untagged,
-#     "DT": POS.Article,
-#     "EX": POS.Untagged,  # TODO
-#     "FW": POS.Untagged,
-#     "IN": POS.Preposition,
-#     "JJ": POS.Adjective,
-#     "JJR": POS.Adjective,
-#     "JJS": POS.Adjective,
-#     "LS": POS.Untagged,
-#     "MD": POS.Modal,
-#     "NN": POS.Noun,
-#     "NNS": POS.Noun,
-#     "NNP": POS.Noun,
-#     "NNPS": POS.Noun,
-#     "PDT": POS.Article,
-#     "POS": POS.Adjective,
-#     "PRP": POS.Pronoun,
-#     "PRP$": POS.Pronoun,
-#     "RB": POS.Adverb,
-#     "RBR": POS.Adverb,
-#     "RBS": POS.Adverb,
-#     "RP": POS.Article,
-#     "TO": POS.Article,  # TODO
-#     "UH": POS.Interjection,
-#     "VB": POS.Verb,
-#     "VBD": POS.Verb,
-#     "VBG": POS.Verb,
-#     "VBN": POS.Verb,
-#     "VBP": POS.Verb,
-#     "VBZ": POS.Verb,
-#     "WDT": POS.Article,
-#     "WP": POS.Pronoun,
-#     "WP$": POS.Pronoun,
-#     "WRB": POS.Adverb,
-# }
-
-# # setup
-# txt = Path('sample.txt').read_text()
-# out = """
-# <!DOCTYPE html>
-# <html>
-# <head>
-# <title>Page Title</title>
-# """
-
-# # add style
-# out += """
-# <style>
-# body {
-#    background-color: #002b36;
-# }
-# """
-# for k in COLOUR_LOOKUP:
-#     out += f"{k} {{ color: {COLOUR_LOOKUP.get(k)}; }}\n"
-
-# out += "</style></head><body>"
-
-# # add content
-# tokenized = sent_tokenize(txt)
-# for i in tokenized:
-#     # Set up NLTK and tag words
-#     wordsList = nltk.word_tokenize(i)
-#     tagged = nltk.pos_tag(wordsList)  # [(word, tag), ...]
-
-#     for (word, tag) in tagged:
-#         tag = TAG_LOOKUP.get(tag)
-#         half = int(len(word) / 2)
-#         word = f"<b>{word[:half]}</b>{word[half:]}"
-#         if tag == None:
-#             tag = POS.Untagged
-#         out += f" <{tag.value}>{word}</{tag.value}>"
-
-# out += "</body></html>"
-# print(out)
