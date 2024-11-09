@@ -5,26 +5,31 @@ from enum import Enum
 
 
 # Our distilled prats of speech
+# value is the HTML tag it uses
 class POS(Enum):
-    Untagged = 0  # obvious
-    Interjection = 1  # ummmm
-    Noun = 2  # obvious
-    Verb = 3  # obvious
-    Adjective = 4  # obvious
-    Adverb = 5  # obvious
-    Preposition = 6  # after/in/on/around
-    Article = 7  # Includes particles
-    Conjunction = 8  # and/or/but
-    Pronoun = 9  # style as a noun probably
-    Modal = 10  # will/can/might/do
+    Untagged = 'ut'  # obvious
+    Interjection = 'ij'  # ummmm
+    Noun = 'nn'  # obvious
+    Verb = 'vb'  # obvious
+    Adjective = 'aj'  # obvious
+    Adverb = 'av'  # obvious
+    Preposition = 'pr'  # after/in/on/around
+    Article = 'ar'  # Includes particles
+    Conjunction = 'cj'  # and/or/but
+    Pronoun = 'pn'  # style as a noun probably
+    Modal = 'ml'  # will/can/might/do
 
 
 # Options passed to the colorise function
 class ColoriseOptions:
 
     # create a new instnace of ColoriseOptions
-    def __init__(self):
+    # lang: string | language identifier
+    def __init__(self, lang):
         # set defaults
+        self.globalstyle = "colorised-style.css"
+        self.lang = lang
+        self.bgcolor = "transparent"
         self.colors = {
             POS.Untagged: '#eee8d5',
             POS.Interjection: '#eee8d5',
@@ -40,9 +45,17 @@ class ColoriseOptions:
         }
         self.embolden = True
 
+    # get the style information for the selected colors
+    # return: string | css style information
+    def get_style(self):
+        s = f"body {{ background-color: {self.bgcolor}; }}\n"
+        for k in self.colors:
+            s += f"{k.value} {{ color: {self.colors.get(k)}; }}\n"
+        return s
+
     # get a color association for a POS
     # pos: POS enum | Part of speech to get color association for
-    # return: string  | hexadecimal color (i.e. "#123456")
+    # return: string  | css color (i.e. "#123456" or "red")
     def get_color(self, pos):
         # ensure preconditions
         if not isinstance(pos, POS):
@@ -53,17 +66,35 @@ class ColoriseOptions:
 
     # set a color association for a POS
     # pos: POS enum | Part of speech to set color association for
-    # col: string | colour to set POS to (i.e. "#123456")
+    # col: string | css color (i.e. "#123456" or "red")
     def set_color(self, pos, col):
         # ensure preconditions
-        if not (isinstance(pos, POS) and type(col) == string
-                and col[0:1] == '#'):
+        if not (isinstance(pos, POS) and type(col) == string):
             print(
                 f"supplied arguments to set_color '{pos}' and '{col}' are incorrect!"
             )
             sys.exit(1)
 
         self.colors[pos] = col
+
+
+# Colorise text based on ColoriseOptions
+class Coloriser:
+
+    # opts: ColoriseOptions | self explanatory
+    def __init__(self, opts):
+        self.opts = opts
+
+    # text: string | raw text, UTF-8
+    # return: string | colorised text
+    def colorise_text(self, text):
+        return 'hi'
+
+    # text: string | xhtml text
+    # return: string | colorised text
+    def colorise_xhtml(self, text):
+        # todo add style
+        return self.colorise_text(text)
 
 
 # from pathlib import Path

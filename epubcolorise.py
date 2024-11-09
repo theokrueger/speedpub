@@ -9,11 +9,11 @@ from ebooklib import epub
 
 import coloriser
 
+
 class EpubColorise:
     # inpath: string | path to an epub file
     # outpath: string | path to output to (including output name)
     def __init__(self, inpath, outpath):
-        self.options = coloriser.ColoriseOptions()
         print(f"Loading epub from {inpath}")
 
         # create output directory if not exist
@@ -28,11 +28,31 @@ class EpubColorise:
         try:
             self.book = epub.read_epub(inpath)
         except:
-            print(f"File {inpath} does not exit");
+            print(f"File {inpath} does not exit")
             sys.exit(1)
+
+        # set our metadata
+        self.lang = self.book.get_metadata('DC', 'language')[0][0]
+        self.title = self.book.get_metadata('DC', 'title')[0][0]
+        self.options = coloriser.ColoriseOptions(self.lang)
+        print(f"Finished loading '{self.title}' in language '{self.lang}'")
 
     # write the colorised epub to the output path
     def write(self):
-        print("write() is a stub")
+        # add style
+        print(f"Adding style to {self.title}")
+        css = epub.EpubItem(uid="global_colorised_style",
+                            file_name=self.options.globalstyle,
+                            media_type="text/css",
+                            content=self.options.get_style())
+        self.book.add_item(css)
 
+        # add color
+        print(f"Colorisng {self.title}")
+        clr = coloriser.Coloriser(self.options)
+        # iterate over xhtml
+        for xhtml in self.book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+            print(f"Colorising {xhtml.get_name()}")
+            xhtml.set_content(clr.colorise_xhtml(xhtml.get_content()))
 
+        epub.write_epub(self.outpath, self.book)
