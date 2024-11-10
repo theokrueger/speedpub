@@ -9,19 +9,7 @@ import coloriser
 import epubcolorise
 
 FILENAME = "Enter Filepath to epub File!"
-COLOR_VALS = {
-    coloriser.POS.Untagged: '#eee8d5',
-    coloriser.POS.Interjection: '#eee8d5',
-    coloriser.POS.Noun: '#b58900',
-    coloriser.POS.Verb: '#cb4b16',
-    coloriser.POS.Adjective: '#d33682',
-    coloriser.POS.Adverb: '#d33682',
-    coloriser.POS.Preposition: '#eee8d5',
-    coloriser.POS.Article: '#eee8d5',
-    coloriser.POS.Conjunction: '#eee8d5',
-    coloriser.POS.Pronoun: '#eee8d5',
-    coloriser.POS.Modal: '#eee8d5',
-}
+COLOR_VALS = coloriser.DEFAULT_COLORS
 def alert(message, root):
     top= Toplevel(root)
     top.geometry("250x100")
@@ -30,34 +18,25 @@ def alert(message, root):
     l.pack()
 
 class color_frame(Frame):
-    curr_config = {
-        coloriser.POS.Untagged: '#eee8d5',
-        coloriser.POS.Interjection: '#eee8d5',
-        coloriser.POS.Noun: '#b58900',
-        coloriser.POS.Verb: '#cb4b16',
-        coloriser.POS.Adjective: '#d33682',
-        coloriser.POS.Adverb: '#d33682',
-        coloriser.POS.Preposition: '#eee8d5',
-        coloriser.POS.Article: '#eee8d5',
-        coloriser.POS.Conjunction: '#eee8d5',
-        coloriser.POS.Pronoun: '#eee8d5',
-        coloriser.POS.Modal: '#eee8d5',
-    }
+    curr_config = COLOR_VALS
 
     cb_list = []
 
     def __init__(self, root):
         top = Toplevel(root)
-        top.geometry("1000x250")
+        top.geometry("1000x400")
         top.title("Colour Picker")
         Label(top, text= "Colour Picker", font=('Mistral 18 bold')).place(x=150,y=80)
+        Label(top, text= "Select Colors for different\nParts of Speech!", font=('Mistral 14'), justify=LEFT).place(x=150,y=160)
 
         #self.curr_config = (0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF)
 
         #color_menu = Button(root, text ="POS_1", command = __choose_color)
         index = 0
         for key in self.curr_config:
-            cb = Button(top, text=key.name, bg=self.curr_config[key])
+            colorstr = self.curr_config[key][1:]
+            fore = '#FFFFFF' if (int(colorstr[:1],16) + int(colorstr[2:3],16) + int(colorstr[4:5],16)) / 3 < 128 else '#000000'
+            cb = Button(top, text=key.name, bg=self.curr_config[key], fg=fore)
             self.cb_list.append(cb)
             #cb.grid( row=1, column=i)
             def handler(event, self=self, key=key, index=index):
@@ -68,14 +47,16 @@ class color_frame(Frame):
 
         def handler(self=self, top=top):
             self.__submit(top)
-        submit_button = Button(top, text ="Save", command = handler)
+        submit_button = Button(top, text ="Save", font=("Arial", 14, "bold"), command = handler)
         submit_button.pack()
 
     def __choose_color(self, event, key, index):
         # variable to store hexadecimal code of color
         color_code = colorchooser.askcolor(title ="Choose color")
         self.curr_config[key] = color_code[1]
-        self.cb_list[index].config(bg=color_code[1])
+        colorstr = color_code[1][1:]
+        fore = '#FFFFFF' if (int(colorstr[:2],16) + int(colorstr[2:4],16) + int(colorstr[4:6],16)) / 3 < 128 else '#000000'
+        self.cb_list[index].config(bg=color_code[1], fg=fore)
 
     def __submit(self, top):
         global COLOR_VALS
@@ -88,7 +69,7 @@ class main(Frame):
     button3_val = 1
 
     def __init__(self, root):
-        w = Label(root, text ='speedpub', font = "50")
+        w = Label(root, text ='SpeedPub', font = "50")
         w.pack()
 
         self.root = root
@@ -160,6 +141,7 @@ class main(Frame):
         root.destroy()
 
 root = Tk()
+root.title("SpeedPub")
 root.geometry("600x300")
 main(root)
 root.mainloop()

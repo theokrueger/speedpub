@@ -7,7 +7,6 @@ import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 import re
 
-
 # Hardcoded punctuation alginments
 class Alignments(Enum):
     Left = -1
@@ -32,7 +31,6 @@ PUNCT_ALIGN = {
     "-": Alignments.Left,
 }
 
-
 # Our distilled prats of speech
 # value is the HTML tag it uses
 class POS(Enum):
@@ -48,8 +46,20 @@ class POS(Enum):
     Pronoun = 'pn'  # style as a noun probably
     Modal = 'ml'  # will/can/might/do
 
-    # Lookup table to convert the NLTK POS tags to our POS tags
-
+# Lookup table to convert the NLTK POS tags to our POS tags
+DEFAULT_COLORS = {
+    POS.Untagged: '#002b36',
+    POS.Interjection: '#002b36',
+    POS.Noun: '#b58900',
+    POS.Verb: '#cb4b16',
+    POS.Adjective: '#d33682',
+    POS.Adverb: '#d33682',
+    POS.Preposition: '#002b36',
+    POS.Article: '#002b36',
+    POS.Conjunction: '#002b36',
+    POS.Pronoun: '#002b36',
+    POS.Modal: '#002b36',
+}
 
 NLTK_TAG_LOOKUP = {
     "CC": POS.Conjunction,
@@ -101,19 +111,7 @@ class ColoriseOptions:
         self.lang = lang
         self.bgcolor = "transparent"
         self.enablecolors = True
-        self.colors = {
-            POS.Untagged: '#002b36',
-            POS.Interjection: '#002b36',
-            POS.Noun: '#b58900',
-            POS.Verb: '#cb4b16',
-            POS.Adjective: '#d33682',
-            POS.Adverb: '#d33682',
-            POS.Preposition: '#002b36',
-            POS.Article: '#002b36',
-            POS.Conjunction: '#002b36',
-            POS.Pronoun: '#002b36',
-            POS.Modal: '#002b36',
-        }
+        self.colors = DEFAULT_COLORS
         self.embolden = True
 
     # get the style information for the selected colors
