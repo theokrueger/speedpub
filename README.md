@@ -31,3 +31,4 @@ The optional GUI is written using [tkinter](https://docs.python.org/3/library/tk
 ![Colorised English](./marketing/en_color.png)
 ![Colorised Chinese](./marketing/zh_color.png)
 ![Emboldened English](./marketing/en_bold.png)
+![On an eReader](./marketing/ereader.jpg)
