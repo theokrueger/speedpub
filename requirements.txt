@@ -1,3 +1,4 @@
 nltk
 ebooklib
 beautifulsoup4
+tkinter
