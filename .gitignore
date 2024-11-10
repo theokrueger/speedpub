@@ -1,6 +1,7 @@
 __pycache__/
 epubs/
 out/
+log.txt
 # emacs stuff
 \#*
 *~
