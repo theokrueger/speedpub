@@ -10,9 +10,21 @@ Introducing: SpeedPUB
 Understand text at a deeper level.
 - Syntax highlighting, but for real languages!
 - A Lingustic Neural Network does the guesswork for you
-- etc etc etc
+- For any level of reader
+
+Read like a native speaker.
+- Highlighting allows you to rapidly grasp grammar structures
+- Assist in filling in the blank for words you don't know
+- Make reading a more engaging experience
 
 #@colourful.png
+
+Too much to read? Too little time?
+- Lean on the subconscious
+- Halve the work your eyes do
+- Backed by Science(tm)
+
+#@bolded.png
 
 Use your existing eBook library.
 - Modifies existing EPUB files
@@ -21,11 +33,11 @@ Use your existing eBook library.
 
 #@calibre.png
 
-To much to read? Too little time?
-- Lean on the subconscious
-- Halve the work your eyes do
-- Backed by Science(tm)
+#@The Details.png
 
-#@bolded.png
+Implementation
+- Modular Python code
+- Drop-in NLP model replacement
+- Cross-platform, GUI and CLI
 
 Thanks / Questions?

@@ -29,6 +29,13 @@ ALIGNMENT_LOOKUP = {
     ";": Alignments.Left,
     "%": Alignments.Left,
     "”": Alignments.Left,
+    "？": Alignments.Left,
+    "。": Alignments.Left,
+    "？": Alignments.Left,
+    "！": Alignments.Left,
+    "，": Alignments.Left,
+    "：": Alignments.Left,
+    "」": Alignments.Left,
     "“": Alignments.Right,
     "<": Alignments.Right,
     "[": Alignments.Right,
@@ -37,6 +44,7 @@ ALIGNMENT_LOOKUP = {
     "#": Alignments.Right,
     "@": Alignments.Right,
     "$": Alignments.Right,
+    "「": Alignments.Right,
 }
 
 

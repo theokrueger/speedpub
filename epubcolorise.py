@@ -32,7 +32,7 @@ class EpubColorise:
         try:
             self.book = epub.read_epub(inpath)
         except:
-            print(f"File {inpath} does not exit")
+            print(f"File {inpath} does not exist")
             sys.exit(1)
 
         # set our metadata

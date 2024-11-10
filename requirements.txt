@@ -2,3 +2,4 @@ nltk
 ebooklib
 beautifulsoup4
 tkinter
+hanlp
