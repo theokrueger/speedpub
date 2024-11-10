@@ -7,29 +7,36 @@ import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 import re
 
+
 # Hardcoded punctuation alginments
 class Alignments(Enum):
     Left = -1
     Right = 1
 
 
-PUNCT_ALIGN = {
-    "[": Alignments.Right,
-    "{": Alignments.Right,
-    "(": Alignments.Right,
-    "“": Alignments.Right,
-    "$": Alignments.Right,
-    "#": Alignments.Right,
+ALIGNMENT_LOOKUP = {
+    "!": Alignments.Left,
+    ".": Alignments.Left,
+    "?": Alignments.Left,
+    ",": Alignments.Left,
+    ">": Alignments.Left,
     "]": Alignments.Left,
     "}": Alignments.Left,
     ")": Alignments.Left,
-    ".": Alignments.Left,
-    ",": Alignments.Left,
-    "?": Alignments.Left,
-    "!": Alignments.Left,
+    ":": Alignments.Left,
+    ";": Alignments.Left,
     "%": Alignments.Left,
-    "-": Alignments.Left,
+    "”": Alignments.Left,
+    "“": Alignments.Right,
+    "<": Alignments.Right,
+    "[": Alignments.Right,
+    "{": Alignments.Right,
+    "(": Alignments.Right,
+    "#": Alignments.Right,
+    "@": Alignments.Right,
+    "$": Alignments.Right,
 }
+
 
 # Our distilled prats of speech
 # value is the HTML tag it uses
@@ -45,6 +52,7 @@ class POS(Enum):
     Conjunction = 'cj'  # and/or/but
     Pronoun = 'pn'  # style as a noun probably
     Modal = 'ml'  # will/can/might/do
+
 
 # Lookup table to convert the NLTK POS tags to our POS tags
 DEFAULT_COLORS = {
@@ -183,18 +191,6 @@ class Coloriser:
     # soup: BeautifulSoup
     # node: A node in soup
     def colorise_soup_recurse(self, soup, node):
-        # if type(node) == NavigableString:
-        #     # NLTK tag the content
-        #     words = nltk.word_tokenize(node)
-        #     tagged = nltk.pos_tag(words)  # [(word, tag), ...]
-
-        #     # add our colouring to the content
-        #     for (word, tag) in tagged:
-        #         tag = NLTK_TAG_LOOKUP.get(tag)
-        #         if tag == None:
-        #             tag = POS.Untagged
-
-        #     return
         i = 0
         for child in node.children:
             if type(child) == NavigableString:
@@ -202,9 +198,31 @@ class Coloriser:
                 words = nltk.word_tokenize(child)
                 tagged = nltk.pos_tag(words)  # [(word, tag), ...]
 
+                # Fix punctuation alignments
+                new_tagged = []
+                pfx = ""
+                for (word, tag) in tagged:
+                    merge = ALIGNMENT_LOOKUP.get(word)
+                    if merge == Alignments.Left:
+                        if len(new_tagged) == 0:
+                            continue
+                        (prevwd, prevtg) = new_tagged.pop()
+                        prevwd = prevwd + word
+                        new_tagged.append((prevwd, prevtg))
+                        continue
+
+                    if merge == Alignments.Right:
+                        pfx = pfx + word
+                        continue
+
+                    word = pfx + word
+                    new_tagged.append((word, tag))
+                    pfx = ""
+
                 # Apply coloring
                 new_node = soup.new_tag(node.name)
-                for (word, tag) in tagged:
+                for (word, tag) in new_tagged:
+
                     tag = NLTK_TAG_LOOKUP.get(tag)
                     if tag == None:
                         tag = POS.Untagged
@@ -220,34 +238,9 @@ class Coloriser:
                     else:
                         new_child.string = word
                     new_node.append(new_child)
+
                 node.contents[i].replace_with(new_node)
+
             else:
                 self.colorise_soup_recurse(soup, child)
             i = i + 1
-
-        # # add color tags to text
-        # for htmltag in node.find_all():
-        #     if htmltag.string:
-        #         # NLTK tag the content
-        #         words = nltk.word_tokenize(htmltag.string)
-        #         tagged = nltk.pos_tag(words)  # [(word, tag), ...]
-        #         htmltag.string = ""
-        #         # add our coloring to the content
-        #         for (word, tag) in tagged:
-        #             # apply color
-        #             tag = NLTK_TAG_LOOKUP.get(tag)
-        #             if tag == None:
-        #                 tag = POS.Untagged
-        #             new_child = soup.new_tag(tag.value)
-        #             # apply bold if applicable
-        #             if self.opts.embolden:
-        #                 half = int(len(word) / 2)
-        #                 bold = soup.new_tag('b')
-        #                 bold.string = f" {word[:half]}"
-        #                 new_child.string = f"{word[half:]}"
-        #                 new_child.insert(0, bold)
-        #             else:
-        #                 new_child.string = " " + word
-        #             htmltag.append(new_child)
-        #     else:
-        #         htmltag.find_all()

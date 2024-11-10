@@ -62,4 +62,5 @@ class EpubColorise:
                     str.encode(clr.colorise_xhtml(xhtml.get_content())))
 
         # write final product
+        print(f"Writing to {self.outpath}")
         epub.write_epub(self.outpath, self.book)
