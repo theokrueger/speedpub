@@ -1,7 +1,7 @@
 ## Read faster. Learn quicker. Understand deeper. SpeedPUB. 
 SpeedPUB provides syntax highlighting to written language. 
 
-![Banner](https://media.githubusercontent.com/media/theokrueger/speedpub/refs/heads/master/marketing/banner.png)
+![Banner](./marketing/banner.png)
 
 ## TL:DR
 SpeedPUB is a tool that leverages an NLP neural network model to colour words based off their purpose in a text. SpeedPUB will improve your reading speed and comprehension in both English and Chinese (so far!).
@@ -25,3 +25,9 @@ The optional GUI is written using [tkinter](https://docs.python.org/3/library/tk
 ## Installation steps
 - Install the pip packagest as listed in `requirements.txt`
 - Mark `gooey.py` as executable, and run it!
+
+## Gallery!
+![GUI](./marketing/gui.png)
+![Colorised English](./marketing/en_color.png)
+![Colorised Chinese](./marketing/zh_color.png)
+![Emboldened English](./marketing/en_bold.png)
