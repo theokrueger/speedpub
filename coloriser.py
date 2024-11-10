@@ -58,15 +58,15 @@ class POS(Enum):
 DEFAULT_COLORS = {
     POS.Untagged: '#002b36',
     POS.Interjection: '#002b36',
-    POS.Noun: '#b58900',
-    POS.Verb: '#cb4b16',
-    POS.Adjective: '#d33682',
+    POS.Noun: '#268bd2',
+    POS.Verb: '#dc322f',
+    POS.Adjective: '#2aa198',
     POS.Adverb: '#d33682',
-    POS.Preposition: '#002b36',
-    POS.Article: '#002b36',
-    POS.Conjunction: '#002b36',
-    POS.Pronoun: '#002b36',
-    POS.Modal: '#002b36',
+    POS.Preposition: '#859900',
+    POS.Article: '#859900',
+    POS.Conjunction: '#6c71c4',
+    POS.Pronoun: '#268bd2',
+    POS.Modal: '#6c71c4',
 }
 
 NLTK_TAG_LOOKUP = {
