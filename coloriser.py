@@ -2,7 +2,7 @@
 # convert some text into coloured HTML
 import sys
 from enum import Enum
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 import re
@@ -76,17 +76,17 @@ class ColoriseOptions:
         self.lang = lang
         self.bgcolor = "transparent"
         self.colors = {
-            POS.Untagged: '#eee8d5',
-            POS.Interjection: '#eee8d5',
+            POS.Untagged: '#002b36',
+            POS.Interjection: '#002b36',
             POS.Noun: '#b58900',
             POS.Verb: '#cb4b16',
             POS.Adjective: '#d33682',
             POS.Adverb: '#d33682',
-            POS.Preposition: '#eee8d5',
-            POS.Article: '#eee8d5',
-            POS.Conjunction: '#eee8d5',
-            POS.Pronoun: '#eee8d5',
-            POS.Modal: '#eee8d5',
+            POS.Preposition: '#002b36',
+            POS.Article: '#002b36',
+            POS.Conjunction: '#002b36',
+            POS.Pronoun: '#002b36',
+            POS.Modal: '#002b36',
         }
         self.embolden = True
 
@@ -145,34 +145,85 @@ class Coloriser:
     def colorise_xhtml(self, xhtml):
         soup = BeautifulSoup(xhtml, 'html.parser')
 
-        # add color tags to text
-        for htmltag in soup.html.body.find_all(re.compile("p")):
-            if htmltag.string:
-                # NLTK tag the content
-                words = nltk.word_tokenize(htmltag.string)
-                tagged = nltk.pos_tag(words)  # [(word, tag), ...]
-                htmltag.string = ""
-                # add our coloring to the content
-                for (word, tag) in tagged:
-                    # apply color
-                    tag = NLTK_TAG_LOOKUP.get(tag)
-                    if tag == None:
-                        tag = POS.Untagged
-                    new_child = soup.new_tag(tag.value)
-                    # apply bold if applicable
-                    if self.opts.embolden:
-                        half = int(len(word) / 2)
-                        bold = soup.new_tag('b')
-                        bold.string = f"{word[:half]}"
-                        new_child.string = f"{word[half:]}"
-                        new_child.insert(0, bold)
-                    else:
-                        new_child.string = word
-                    htmltag.append(new_child)
+        self.colorise_soup_recurse(soup, soup.html.body)
 
         # add style to top
         style_tag = soup.new_tag('style')
         style_tag.string = self.opts.get_style()
         soup.html.body.insert(0, style_tag)
 
-        return str.encode(soup.prettify())
+        return str.encode(str(soup))
+
+    # soup: BeautifulSoup
+    # node: A node in soup
+    def colorise_soup_recurse(self, soup, node):
+        # if type(node) == NavigableString:
+        #     # NLTK tag the content
+        #     words = nltk.word_tokenize(node)
+        #     tagged = nltk.pos_tag(words)  # [(word, tag), ...]
+
+        #     # add our colouring to the content
+        #     for (word, tag) in tagged:
+        #         tag = NLTK_TAG_LOOKUP.get(tag)
+        #         if tag == None:
+        #             tag = POS.Untagged
+
+        #     return
+        i = 0
+        for child in node.children:
+            if type(child) == NavigableString:
+                # NLTK tag the content
+                words = nltk.word_tokenize(child)
+                tagged = nltk.pos_tag(words)  # [(word, tag), ...]
+
+                # Apply coloring
+                new_node = soup.new_tag(node.name)
+                for (word, tag) in tagged:
+                    tag = NLTK_TAG_LOOKUP.get(tag)
+                    if tag == None:
+                        tag = POS.Untagged
+
+                    new_child = soup.new_tag(tag.value)
+                    # apply bold if needed
+                    if self.opts.embolden:
+                        half = max(int(len(word) / 2 + 0.5), min(len(word), 3))
+                        bolded = soup.new_tag('b')
+                        bolded.string = word[:half]
+                        unbolded = soup.new_tag('ub')
+                        unbolded.string = word[half:]
+                        new_child.append(bolded)
+                        new_child.append(unbolded)
+                    else:
+                        new_child.string = word
+                    new_node.append(new_child)
+                node.contents[i].replace_with(new_node)
+            else:
+                self.colorise_soup_recurse(soup, child)
+            i = i + 1
+
+        # # add color tags to text
+        # for htmltag in node.find_all():
+        #     if htmltag.string:
+        #         # NLTK tag the content
+        #         words = nltk.word_tokenize(htmltag.string)
+        #         tagged = nltk.pos_tag(words)  # [(word, tag), ...]
+        #         htmltag.string = ""
+        #         # add our coloring to the content
+        #         for (word, tag) in tagged:
+        #             # apply color
+        #             tag = NLTK_TAG_LOOKUP.get(tag)
+        #             if tag == None:
+        #                 tag = POS.Untagged
+        #             new_child = soup.new_tag(tag.value)
+        #             # apply bold if applicable
+        #             if self.opts.embolden:
+        #                 half = int(len(word) / 2)
+        #                 bold = soup.new_tag('b')
+        #                 bold.string = f" {word[:half]}"
+        #                 new_child.string = f"{word[half:]}"
+        #                 new_child.insert(0, bold)
+        #             else:
+        #                 new_child.string = " " + word
+        #             htmltag.append(new_child)
+        #     else:
+        #         htmltag.find_all()
