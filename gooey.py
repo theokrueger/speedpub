@@ -4,6 +4,7 @@ import time
 import threading
 from tkinter import *
 from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askdirectory
 from tkinter import colorchooser
 import coloriser
 import epubcolorise
@@ -102,16 +103,8 @@ class main(Frame):
                             height = 2,
                             width = 10)
 
-        button3 = Checkbutton(root, text = "PLACEHOLDER",
-                            variable = self.button3_val,
-                            onvalue = 1,
-                            offvalue = 0,
-                            height = 2,
-                            width = 10)
-
         button1.pack()
         button2.pack()
-        button3.pack()
 
         def handler(self=self, root=root):
             self.__raise_color_picker(root)
@@ -134,7 +127,12 @@ class main(Frame):
         if(FILENAME == "Enter Filepath to epub File!"):
             alert("Select an epub file!", self.root)
             return
-        b = epubcolorise.EpubColorise(FILENAME, './out/joe.epub')
+        direc = askdirectory()
+        if(not os.path.exists(direc)):
+            alert("Invalid Directory!", self.root)
+            return
+        b = epubcolorise.EpubColorise(FILENAME, direc)
+        b.options.enablecolors = True if self.button1_val == 1 else False
         b.options.embolden = True if self.button2_val == 1 else False
         b.options.colors = COLOR_VALS
         b.write()
