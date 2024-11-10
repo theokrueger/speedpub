@@ -8,6 +8,31 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 import re
 
 
+# Hardcoded punctuation alginments
+class Alignments(Enum):
+    Left = -1
+    Right = 1
+
+
+PUNCT_ALIGN = {
+    "[": Alignments.Right,
+    "{": Alignments.Right,
+    "(": Alignments.Right,
+    "“": Alignments.Right,
+    "$": Alignments.Right,
+    "#": Alignments.Right,
+    "]": Alignments.Left,
+    "}": Alignments.Left,
+    ")": Alignments.Left,
+    ".": Alignments.Left,
+    ",": Alignments.Left,
+    "?": Alignments.Left,
+    "!": Alignments.Left,
+    "%": Alignments.Left,
+    "-": Alignments.Left,
+}
+
+
 # Our distilled prats of speech
 # value is the HTML tag it uses
 class POS(Enum):
@@ -75,6 +100,7 @@ class ColoriseOptions:
         #self.globalstyle = "colorised-style.css"
         self.lang = lang
         self.bgcolor = "transparent"
+        self.enablecolors = True
         self.colors = {
             POS.Untagged: '#002b36',
             POS.Interjection: '#002b36',
@@ -99,8 +125,10 @@ class ColoriseOptions:
           color: {self.colors.get(POS.Untagged)};
         }}
         """
-        for k in self.colors:
-            s += f"{k.value} {{ color: {self.colors.get(k)}; }}\n"
+        if self.enablecolors:
+            for k in self.colors:
+                s += f"{k.value} {{ color: {self.colors.get(k)}; }}\n"
+
         return s
 
     # get a color association for a POS
@@ -152,7 +180,7 @@ class Coloriser:
         style_tag.string = self.opts.get_style()
         soup.html.body.insert(0, style_tag)
 
-        return str.encode(str(soup))
+        return str(soup)
 
     # soup: BeautifulSoup
     # node: A node in soup
@@ -189,10 +217,8 @@ class Coloriser:
                         half = max(int(len(word) / 2 + 0.5), min(len(word), 3))
                         bolded = soup.new_tag('b')
                         bolded.string = word[:half]
-                        unbolded = soup.new_tag('ub')
-                        unbolded.string = word[half:]
-                        new_child.append(bolded)
-                        new_child.append(unbolded)
+                        new_child.string = word[half:]
+                        new_child.insert(0, bolded)
                     else:
                         new_child.string = word
                     new_node.append(new_child)

@@ -58,7 +58,8 @@ class EpubColorise:
         for xhtml in self.book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
             if not XHTML_TO_IGNORE.get(xhtml.get_name()):
                 print(f"Colorising {xhtml.get_name()}")
-                xhtml.set_content(clr.colorise_xhtml(xhtml.get_content()))
+                xhtml.set_content(
+                    str.encode(clr.colorise_xhtml(xhtml.get_content())))
 
         # write final product
         epub.write_epub(self.outpath, self.book)
