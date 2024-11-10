@@ -43,14 +43,6 @@ class EpubColorise:
 
     # write the colorised epub to the output path
     def write(self):
-        # add style
-        # print(f"Adding style to {self.title}")
-        # css = epub.EpubItem(uid="global_colorised_style",
-        #                     file_name=self.options.globalstyle,
-        #                     media_type="text/css",
-        #                     content=self.options.get_style())
-        # self.book.add_item(css)
-
         # add color
         print(f"Performing full colorisation for {self.title}")
         clr = coloriser.Coloriser(self.options)

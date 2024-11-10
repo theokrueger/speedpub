@@ -117,7 +117,7 @@ class ColoriseOptions:
         # set defaults
         #self.globalstyle = "colorised-style.css"
         self.lang = lang
-        self.bgcolor = "transparent"
+        self.bgcolor = "white"
         self.enablecolors = True
         self.colors = DEFAULT_COLORS
         self.embolden = True
