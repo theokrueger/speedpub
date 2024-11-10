@@ -4,7 +4,9 @@ import sys
 from enum import Enum
 from bs4 import BeautifulSoup, NavigableString
 import nltk
+#from nltk.tag import StanfordPOSTagger
 from nltk.tokenize import word_tokenize, sent_tokenize
+import hanlp
 import re
 
 
@@ -54,7 +56,7 @@ class POS(Enum):
     Modal = 'ml'  # will/can/might/do
 
 
-# Lookup table to convert the NLTK POS tags to our POS tags
+# Lookup table to convert the Tagset POS tags to our POS tags
 DEFAULT_COLORS = {
     POS.Untagged: '#002b36',
     POS.Interjection: '#002b36',
@@ -107,6 +109,45 @@ NLTK_TAG_LOOKUP = {
     "WRB": POS.Adverb,
 }
 
+PENN_CHINESE_TAG_LOOKUP = {
+    'AD': POS.Adverb,
+    'AS': POS.Adverb,
+    'BA': POS.Adverb,
+    'CC': POS.Conjunction,
+    'CD': POS.Untagged,
+    'CS': POS.Conjunction,
+    'DEC': POS.Article,
+    'DEG': POS.Article,
+    'DER': POS.Article,
+    'DEV': POS.Adverb,
+    'DT': POS.Article, # TODO Give own category
+    'ETC': POS.Untagged,
+    'EM': POS.Untagged,
+    'FW': POS.Untagged,
+    'IC': POS.Untagged,
+    'IJ': POS.Interjection,
+    'JJ': POS.Adjective,
+    'LB': POS.Adverb,
+    'LC': POS.Noun,
+    'M': POS.Article, # TODO Give own category
+    'MSP': POS.Article,
+    'NN': POS.Noun,
+    'NOI': POS.Untagged,
+    'NR': POS.Noun,
+    'NT': POS.Noun,
+    'OD': POS.Untagged,
+    'ON': POS.Untagged,
+    'P': POS.Preposition,
+    'PN': POS.Pronoun,
+    'PU': POS.Untagged,
+    'SB': POS.Adverb,
+    'SP': POS.Article,
+    'URL': POS.Untagged,
+    'VA': POS.Adjective,
+    'VC': POS.Verb,
+    'VE': POS.Verb,
+    'VV': POS.Verb,
+}
 
 # Options passed to the colorise function
 class ColoriseOptions:
@@ -168,6 +209,8 @@ class Coloriser:
     # opts: ColoriseOptions | self explanatory
     def __init__(self, opts):
         self.opts = opts
+        self.pos = hanlp.load(hanlp.pretrained.pos.CTB9_POS_ELECTRA_SMALL)
+        self.tok = hanlp.load(hanlp.pretrained.tok.COARSE_ELECTRA_SMALL_ZH)
 
     # text: string | raw text, UTF-8
     # return: string | colorised text
@@ -191,12 +234,27 @@ class Coloriser:
     # soup: BeautifulSoup
     # node: A node in soup
     def colorise_soup_recurse(self, soup, node):
+        tag_list = NLTK_TAG_LOOKUP # Which Taglist to use while looking up tag to color conversions
         i = 0
         for child in node.children:
             if type(child) == NavigableString:
-                # NLTK tag the content
-                words = nltk.word_tokenize(child)
-                tagged = nltk.pos_tag(words)  # [(word, tag), ...]
+                if(self.opts.lang == 'zh' or self.opts.lang == 'zh-Hans' or self.opts.lang == 'zh-hant'): # for now, hard-code Chinese Language Support
+                    tagged = self.tok(child)
+
+                    # Flatten tokenized sentences
+                    flat_list = []
+                    for xs in tagged:
+                        for x in xs:
+                            flat_list.append(x)
+                    tagged = self.pos(flat_list)
+                    tagged = list(zip(flat_list, tagged))
+                    tag_list = PENN_CHINESE_TAG_LOOKUP
+
+                else: # default to English Model
+                    # NLTK tag the content
+                    words = nltk.word_tokenize(child)
+                    tagged = nltk.pos_tag(words)  # [(word, tag), ...]
+                    tag_list = NLTK_TAG_LOOKUP
 
                 # Fix punctuation alignments
                 new_tagged = []
@@ -223,7 +281,7 @@ class Coloriser:
                 new_node = soup.new_tag(node.name)
                 for (word, tag) in new_tagged:
 
-                    tag = NLTK_TAG_LOOKUP.get(tag)
+                    tag = tag_list.get(tag)
                     if tag == None:
                         tag = POS.Untagged
 
