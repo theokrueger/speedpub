@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os, sys
 import time
 import threading
@@ -87,7 +88,7 @@ class main(Frame):
     button3_val = 1
 
     def __init__(self, root):
-        w = Label(root, text ='People_of_Colour', font = "50")
+        w = Label(root, text ='speedpub', font = "50")
         w.pack()
 
         self.root = root
