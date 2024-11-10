@@ -87,7 +87,6 @@ class main(Frame):
 
         self.button1_val = IntVar()
         self.button2_val = IntVar()
-        self.button3_val = IntVar()
 
         button1 = Checkbutton(root, text = "Colour Text",
                             variable = self.button1_val,
@@ -134,10 +133,9 @@ class main(Frame):
             alert("Invalid Directory!", self.root)
             return
         direc += '/' + FILENAME.split('/')[len(FILENAME.split('/')) - 1]
-        print(direc)
         b = epubcolorise.EpubColorise(FILENAME, direc)
-        b.options.enablecolors = True if self.button1_val == 1 else False
-        b.options.embolden = True if self.button2_val == 1 else False
+        b.options.enablecolors = True if self.button1_val.get() == 1 else False
+        b.options.embolden = True if self.button2_val.get() == 1 else False
         b.options.colors = COLOR_VALS
         b.write()
         root.destroy()
