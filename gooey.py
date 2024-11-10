@@ -131,6 +131,8 @@ class main(Frame):
         if(not os.path.exists(direc)):
             alert("Invalid Directory!", self.root)
             return
+        direc += '/' + FILENAME.split('/')[len(FILENAME.split('/')) - 1]
+        print(direc)
         b = epubcolorise.EpubColorise(FILENAME, direc)
         b.options.enablecolors = True if self.button1_val == 1 else False
         b.options.embolden = True if self.button2_val == 1 else False
