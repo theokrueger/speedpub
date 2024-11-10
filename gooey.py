@@ -15,7 +15,7 @@ def alert(message, root):
     top= Toplevel(root)
     top.geometry("250x100")
     top.title("Alert")
-    l = Label(top, text= message, font=('Mistral 18 bold'))
+    l = Label(top, text= message, font=('Mistral', 18, 'bold'))
     l.pack()
 
 class color_frame(Frame):
@@ -27,8 +27,8 @@ class color_frame(Frame):
         top = Toplevel(root)
         top.geometry("1000x400")
         top.title("Colour Picker")
-        Label(top, text= "Colour Picker", font=('Mistral 18 bold')).place(x=150,y=80)
-        Label(top, text= "Select Colors for different\nParts of Speech!", font=('Mistral 14'), justify=LEFT).place(x=150,y=160)
+        Label(top, text= "Colour Picker", font=('Mistral', 18, 'bold')).place(x=150,y=80)
+        Label(top, text= "Select Colors for different\nParts of Speech!", font=('Mistral', 14), justify=LEFT).place(x=150,y=160)
 
         #self.curr_config = (0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF)
 
@@ -48,7 +48,7 @@ class color_frame(Frame):
 
         def handler(self=self, top=top):
             self.__submit(top)
-        submit_button = Button(top, text ="Save", font=("Arial", 14, "bold"), command = handler)
+        submit_button = Button(top, text ="Save", font=("Mistral", 14, "bold"), command = handler)
         submit_button.pack()
 
     def __choose_color(self, event, key, index):
@@ -82,7 +82,7 @@ class main(Frame):
 
         def handler(self=self, l=l):
             self.__fileselect(l)
-        browse = Button(root, text ="Browse", command = handler)
+        browse = Button(root, text ="Browse", font=('Mistral', 14), command = handler)
         browse.pack()
 
         self.button1_val = IntVar()
@@ -94,24 +94,26 @@ class main(Frame):
                             onvalue = 1,
                             offvalue = 0,
                             height = 2,
-                            width = 10)
+                            width = 10,
+                            font=('Mistral', 14))
 
         button2 = Checkbutton(root, text = "Bold Text",
                             variable = self.button2_val,
                             onvalue = 1,
                             offvalue = 0,
                             height = 2,
-                            width = 10)
+                            width = 10,
+                            font=('Mistral', 14))
 
         button1.pack()
         button2.pack()
 
         def handler(self=self, root=root):
             self.__raise_color_picker(root)
-        color_menu_button = Button(root, text ="Colour Picker", command = handler)
+        color_menu_button = Button(root, text ="Colour Picker", font=('Mistral', 14), command = handler)
         color_menu_button.pack()
 
-        submit_button = Button(root, text ="Colourise", command = self.__submit)
+        submit_button = Button(root, text ="Colourise", font=('Mistral', 14), command = self.__submit)
         submit_button.pack()
     def __fileselect(self, l):
         filename = askopenfilename() # show an "Open" dialog box and return the path to the selected file
