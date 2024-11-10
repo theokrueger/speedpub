@@ -128,7 +128,7 @@ PENN_CHINESE_TAG_LOOKUP = {
     'DEG': POS.Article,
     'DER': POS.Article,
     'DEV': POS.Adverb,
-    'DT': POS.Article, # TODO Give own category
+    'DT': POS.Article,  # TODO Give own category
     'ETC': POS.Untagged,
     'EM': POS.Untagged,
     'FW': POS.Untagged,
@@ -137,7 +137,7 @@ PENN_CHINESE_TAG_LOOKUP = {
     'JJ': POS.Adjective,
     'LB': POS.Adverb,
     'LC': POS.Noun,
-    'M': POS.Article, # TODO Give own category
+    'M': POS.Article,  # TODO Give own category
     'MSP': POS.Article,
     'NN': POS.Noun,
     'NOI': POS.Untagged,
@@ -156,6 +156,7 @@ PENN_CHINESE_TAG_LOOKUP = {
     'VE': POS.Verb,
     'VV': POS.Verb,
 }
+
 
 # Options passed to the colorise function
 class ColoriseOptions:
@@ -182,7 +183,11 @@ class ColoriseOptions:
         """
         if self.enablecolors:
             for k in self.colors:
-                s += f"{k.value} {{ color: {self.colors.get(k)}; }}\n"
+                s += f"""
+                {k.value} {{
+                  color: {self.colors.get(k)};
+                  /*text-shadow: 1px 1px #00000080;*/
+                }}"""
 
         return s
 
@@ -242,11 +247,13 @@ class Coloriser:
     # soup: BeautifulSoup
     # node: A node in soup
     def colorise_soup_recurse(self, soup, node):
-        tag_list = NLTK_TAG_LOOKUP # Which Taglist to use while looking up tag to color conversions
+        tag_list = NLTK_TAG_LOOKUP  # Which Taglist to use while looking up tag to color conversions
         i = 0
         for child in node.children:
             if type(child) == NavigableString:
-                if(self.opts.lang == 'zh' or self.opts.lang == 'zh-Hans' or self.opts.lang == 'zh-hant'): # for now, hard-code Chinese Language Support
+                if (self.opts.lang == 'zh' or self.opts.lang == 'zh-Hans'
+                        or self.opts.lang == 'zh-hant'
+                    ):  # for now, hard-code Chinese Language Support
                     tagged = self.tok(child)
 
                     # Flatten tokenized sentences
@@ -258,7 +265,7 @@ class Coloriser:
                     tagged = list(zip(flat_list, tagged))
                     tag_list = PENN_CHINESE_TAG_LOOKUP
 
-                else: # default to English Model
+                else:  # default to English Model
                     # NLTK tag the content
                     words = nltk.word_tokenize(child)
                     tagged = nltk.pos_tag(words)  # [(word, tag), ...]

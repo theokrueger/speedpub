@@ -5,35 +5,37 @@ Reading is hard.
 But what if we could make it easier, without compromising the integrity of the text?
 
 Introducing: SpeedPUB
-[tagline] 
+Book better.
 
 Understand text at a deeper level.
 - Syntax highlighting, but for real languages!
 - A Lingustic Neural Network does the guesswork for you
 - For any level of reader
 
+@en_color.png
+
 Read like a native speaker.
 - Highlighting allows you to rapidly grasp grammar structures
 - Assist in filling in the blank for words you don't know
 - Make reading a more engaging experience
 
-#@colourful.png
+@zh_color.png
 
 Too much to read? Too little time?
 - Lean on the subconscious
 - Halve the work your eyes do
 - Backed by Science(tm)
 
-#@bolded.png
+@en_bold.png
 
 Use your existing eBook library.
 - Modifies existing EPUB files
 - Easy-to-use GUI for conversion
 - Customisable colouring
 
-#@calibre.png
+@gui.png
 
-#@The Details.png
+Live Demo
 
 Implementation
 - Modular Python code
