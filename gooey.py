@@ -30,16 +30,15 @@ class color_frame(Frame):
         Label(top, text= "Colour Picker", font=('Mistral', 18, 'bold')).place(x=150,y=80)
         Label(top, text= "Select Colors for different\nParts of Speech!", font=('Mistral', 14), justify=LEFT).place(x=150,y=160)
 
-        #self.curr_config = (0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF)
-
-        #color_menu = Button(root, text ="POS_1", command = __choose_color)
         index = 0
         for key in self.curr_config:
-            colorstr = self.curr_config[key][1:]
-            fore = '#FFFFFF' if (int(colorstr[:1],16) + int(colorstr[2:3],16) + int(colorstr[4:5],16)) / 3 < 128 else '#000000'
+            fore = '#FFFFFF' #default
+
+            if(self.curr_config[key]):
+                colorstr = self.curr_config[key][1:]
+                fore = '#FFFFFF' if (int(colorstr[:1],16) + int(colorstr[2:3],16) + int(colorstr[4:5],16)) / 3 < 128 else '#000000'
             cb = Button(top, text=key.name, bg=self.curr_config[key], fg=fore)
             self.cb_list.append(cb)
-            #cb.grid( row=1, column=i)
             def handler(event, self=self, key=key, index=index):
                 self.__choose_color(event, key, index=index)
             cb.bind('<Button-1>', handler)
@@ -55,8 +54,10 @@ class color_frame(Frame):
         # variable to store hexadecimal code of color
         color_code = colorchooser.askcolor(title ="Choose color")
         self.curr_config[key] = color_code[1]
-        colorstr = color_code[1][1:]
-        fore = '#FFFFFF' if (int(colorstr[:2],16) + int(colorstr[2:4],16) + int(colorstr[4:6],16)) / 3 < 128 else '#000000'
+        fore = '#FFFFFF' #default
+        if(self.curr_config[key]):
+            colorstr = color_code[1][1:]
+            fore = '#FFFFFF' if (int(colorstr[:2],16) + int(colorstr[2:4],16) + int(colorstr[4:6],16)) / 3 < 128 else '#000000'
         self.cb_list[index].config(bg=color_code[1], fg=fore)
 
     def __submit(self, top):
